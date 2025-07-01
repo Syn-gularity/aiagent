@@ -16,6 +16,9 @@ def main():
         When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 
         - List files and directories
+        - Read file contents
+        - Execute Python files with optional arguments
+        - Write or overwrite files
 
         All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
         """
@@ -27,15 +30,11 @@ def main():
     verbose = False
     if len(args) > 2 and args[2] == "--verbose":
         verbose = True
-
     
-
-    
-
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
-
+    # Handling the AI Response
     response = client.models.generate_content(
         model="gemini-2.0-flash-001", 
         contents=messages,
