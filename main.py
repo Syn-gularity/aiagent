@@ -3,6 +3,7 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from call_function import available_functions
 
 def main():
     load_dotenv("./gemini.env")
@@ -27,25 +28,9 @@ def main():
     if len(args) > 2 and args[2] == "--verbose":
         verbose = True
 
-    schema_get_files_info = types.FunctionDeclaration(
-        name="get_files_info",
-        description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
-        parameters=types.Schema(
-            type=types.Type.OBJECT,
-            properties={
-                "directory": types.Schema(
-                    type=types.Type.STRING,
-                    description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
-                ),
-            },
-        ),
-    )
+    
 
-    available_functions = types.Tool(
-        function_declarations=[
-            schema_get_files_info,
-        ]
-    )
+    
 
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
@@ -59,10 +44,11 @@ def main():
         ),
     )
     if response.function_calls != None:
-        function_call_part = response.function_calls[0]
-        print(function_call_part)
-        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+        for function_call_part in response.function_calls:
+            print(function_call_part)
+            print(f"Calling function: {function_call_part.name}({function_call_part.args})")
     else:
+        print("Normal Response:")
         print(response.text)
     if verbose:
         print(f"User prompt: {user_prompt}")
